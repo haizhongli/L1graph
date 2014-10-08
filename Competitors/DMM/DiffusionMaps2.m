@@ -1,0 +1,20 @@
+function [V,D]=DiffusionMaps2(AffSim,t, gni)
+nrow=(size(AffSim,1));
+AffSim=NormalizeRow1(AffSim);
+[V, D]=eig((AffSim));
+V=real(V);
+D=real(D);
+D = sum(D,2);
+GCombine=[D';V];
+GCombine=sortrows(GCombine')';
+GCombine=fliplr(GCombine);
+D=(GCombine(1,:));
+V=(GCombine(2:end,:));
+D=real(D.^t);
+D=repmat(D, [nrow 1]);
+V=D.*V;
+
+a=1;
+b=a+gni-1;
+%b=max(a+gni-1,a+2);
+V=V(:,a:b);
