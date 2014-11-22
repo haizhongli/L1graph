@@ -1,4 +1,4 @@
-function [W] = SparseGraphHKS(Data)
+function [W,dict_ids] = SparseGraphHKS(Data)
 
 %% normalize
 Data = NMRow(Data);
@@ -38,19 +38,19 @@ fprintf('Dictionary Coherence: %d\n',coh);
 % end
 
 %%sparse coding;
-non_dict_ids = 1:N;
-non_dict_ids(dict_ids) = [];
+% non_dict_ids = 1:N;
+% non_dict_ids(dict_ids) = [];
 %G = L1GraphCoSaMPHeat(Data, dict_ids);
-G = L1GraphNNOMP(Data,dict_ids);
+W = L1GraphNNOMPBiP(Data,dict_ids);
 
-%% store to a sparse graph
-[i,j,v] = find(G);
-for k = 1:length(i)
-    i(k) = non_dict_ids(i(k));
-end
-for k =1:length(j)
-    j(k) = dict_ids(j(k));
-end
-W = sparse(i,j,v,N,N);
+% %% store to a sparse graph
+% [i,j,v] = find(G);
+% for k = 1:length(i)
+%     i(k) = non_dict_ids(i(k));
+% end
+% for k =1:length(j)
+%     j(k) = dict_ids(j(k));
+% end
+% W = sparse(i,j,v,N,N);
 
 end
