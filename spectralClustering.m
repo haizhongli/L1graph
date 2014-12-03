@@ -17,7 +17,7 @@ L =  D*W*D;
 %figure, plot(egss(1:k),'-*');
 evecs = evecs(:,ids(1:end));
 evecs = NMRow(evecs); %abandoned the first eigenvalue/vectors
-%IDX = kmeans(evecs,k);
-[ctrs,~,~] = WCSSKmeans(evecs,k,50,50);
-IDX = findlabels(ctrs,evecs);
+IDX = kmeans(evecs,k);
+%[ctrs,~,~] = WCSSKmeans(evecs,k,50,50);
+%IDX = findlabels(ctrs,evecs);
 end
