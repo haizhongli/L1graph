@@ -1,4 +1,4 @@
-function [nmi,ac] = evalNMIAc(true_labels,predict_labels)
+function [nmi,ac] = evalNMIAC(true_labels,predict_labels)
 % This code is following Dr. Deng Cai's code. 
 % http://www.cad.zju.edu.cn/home/dengcai/
 %

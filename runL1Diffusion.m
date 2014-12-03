@@ -30,7 +30,7 @@ dict_sizes = zeros(n,1);
 
 %% normalization, first feature, then observation (required by L1 graph)
 data = NMRow(data')';
-%data = NMRow(data);
+data = NMRow(data);
 %n = size(data,1); % number of observations;
 %m = size(data,2); % number of features;
 

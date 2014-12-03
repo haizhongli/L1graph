@@ -2,8 +2,8 @@
 function Sim  = Gaussian(EuDis, GorL,Sigma)
 %% Gaussian Affinity
 % EuDis=L2_distance(XXi',XXi',1);  %% To compute Euclidean distance
-f=1;
-d=1;
+f=2;
+d=2;
 if  ((GorL==0))
     Sim = exp (   -((EuDis).^d)  ./ (f*(Sigma.^d))  );   
 elseif ((GorL==1))
