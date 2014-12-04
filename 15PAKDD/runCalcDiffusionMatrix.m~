@@ -22,19 +22,20 @@ P = adj_sim*D;
 %% creat a array of matrix
 AP = zeros(size(P,1),size(P,2),T+1);
 AP(:,:,1) = P;
-for step = 1:T
-    AP(
+for step = 2:T
+    AP(:,:,step) = P*AP(:,:,step-1);
 end
 
-
+F = zeros(size(P,1),size(P,2),T);
 for step =1:T
     alpha = 1/(step+1);
-    F = alpha*P^0;
+    F(:,:,step) = alpha*AP(:,:,1);
     for j = 1:step
-      F = F + alpha*P^j;
+      F(:,:,step) = F(:,:,step) + alpha*AP(:,:,step+1);
     end
-    fname = sprintf('%s_F%d.mat',matrix{i},step);
-    save(fname,'F');
 end
+
+fname = sprintf('%s_F.mat',matrix{i});
+save(fname,'F');
 
 end
