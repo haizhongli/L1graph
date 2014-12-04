@@ -6,7 +6,7 @@
 %% cosine similarity matrix
 %% variable: G_cos
 matrix = {'G_cos', 'G_fixed'};
-T = 5;
+T = 10;
 
 for i = 1:length(matrix)
 
