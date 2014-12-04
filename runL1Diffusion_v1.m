@@ -102,11 +102,12 @@ if ~solver_flag
     quiet = true;
 end
 
-
+%% 
+F(logical(eye(n))) = 0;
 
 for i=1:n
    %% find dictionary index
-   ids = find(F(:,i) >= 0.0001);
+   ids = find(F(:,i) > mean(F(:,i)));
    if ( length(ids) < minmum_dict_size)
        fprintf('dictioinary size is less than threshold: %d',length(ids));
    end
