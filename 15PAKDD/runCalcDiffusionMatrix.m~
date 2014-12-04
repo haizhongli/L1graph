@@ -6,7 +6,7 @@
 %% cosine similarity matrix
 %% variable: G_cos
 matrix = {'G_cos', 'G_fixed'};
-T = 5;
+T = 10;
 
 for i = 1:length(matrix)
 
@@ -18,11 +18,23 @@ D = diag ( 1 ./ sum(adj_sim,1));
 P = adj_sim*D;
 
 %% graph diffusion
+%% the following code need to be improved.
+%% creat a array of matrix
+AP = zeros(size(P,1),size(P,2),T+1);
+AP(:,:,1) = P;
+for step = 1:T
+    AP(
+end
+
+
 for step =1:T
     alpha = 1/(step+1);
     F = alpha*P^0;
     for j = 1:step
       F = F + alpha*P^j;
     end
+    fname = sprintf('%s_F%d.mat',matrix{i},step);
+    save(fname,'F');
 end
+
 end
