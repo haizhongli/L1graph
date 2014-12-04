@@ -2,10 +2,10 @@
 function Sim  = Gaussian(EuDis, GorL,Sigma)
 %% Gaussian Affinity
 % EuDis=L2_distance(XXi',XXi',1);  %% To compute Euclidean distance
-f=2;
+f=1;
 d=2;
 if  ((GorL==0))
-    Sim = exp (   -((EuDis).^d)  ./ (f*(Sigma.^d))  );   
+    Sim = exp (   -((EuDis).^d)  ./ (f*(Sigma.^1))  );   
 elseif ((GorL==1))
     LocalScale=LocalScaling(EuDis,Sigma);
     LocalScale=(LocalScale*LocalScale').^(1/2);

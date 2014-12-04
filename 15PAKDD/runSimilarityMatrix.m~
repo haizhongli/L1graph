@@ -1,0 +1,56 @@
+% Given a Data set, find the following three similarity matrix;
+% 1. gaussian_fixed.mat  --- gaussian similarity matrix with fixed sigma;
+% 2. guassian_tuned.mat  --- tuned best similarity matrix; report sigma;
+% 3. cosine.mat          --- cosine similarity matrix;
+
+data = Data;
+true_labels = ClusterLabels;
+num_cluster = NumC;
+
+
+%% Add Path
+addpath('BasicFunctions');
+addpath('Competitors/NJW');
+%addpath('Competitors/SMCE');
+
+%% Normalization
+nA = NMRow(data')';
+
+%% cosine similarity
+G_cos = myCosineSim(nA);
+save('cosine.mat','G_cos');
+WW = NormalizationFamily(W, -0.5);
+[~,evecs] = NJW(WW,num_cluster);
+idx = kmeans(evecs,num_cluster);
+
+
+%% Gaussian Similarity with fixed sigma
+G_fixed = myGaussianMedian(nA);
+
+
+%% tune Gaussian similairty
+D = squareform(pdist(nA));
+max_nmi = 0;
+max_ac = 0;
+max_sigma = 0;
+G_tuned = zeros(size(nA,1),size(nA,1));
+for i = 0.1:0.1:1.6
+	i
+    W = Gaussian(D,0,i);
+    WW = NormalizationFamily(W, -0.5);
+    [~,evecs] = NJW(WW,num_cluster);
+    idx_njw  = kmeans(evecs,num_cluster);
+
+    %idx_njw = kmeans(evecs,num_cluster);
+    %[newctrs,ctrssize,real_wcss] = WCSSKmeans(evecs,num_cluster,50,50);
+    %idx_njw = findlabels(newctrs,evecs);
+
+
+    [nmi_njw,ac_njw] = evalNMIAC(true_labels,idx_njw);
+    if nmi_njw > max_nmi
+        max_nmi = nmi_njw;
+        max_ac = ac_njw;
+        max_sigma=i;
+        G_tuned = W;
+    end
+end

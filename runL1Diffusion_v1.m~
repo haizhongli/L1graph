@@ -4,13 +4,7 @@
 %      -- spectral clustering performance of : NJW, NJW based on L1 graph.
 %         measure with NMI and ACC
 %
-% data need to be recorded:
-% 1, fixed sigma:  NMI&AC(NJW, L1Diff), Different Step (t=1,2,3,4,5) 
 %
-%
-%
-%
-
 addpath('BasicFunctions');
 addpath('Competitors/NJW');
 addpath('l1_ls_matlab/l1_ls_matlab');
@@ -24,7 +18,7 @@ true_labels = ClusterLabels;
 n = size(data,1); % number of observations;
 m = size(data,2); % number of features;
 
-step = 3;    %% step of random walk;
+step = 2;    %% step of random walk;
 minmum_dict_size = m + 1; %% threshold of dictionary
 k_target = m;
 %% misc
@@ -37,7 +31,7 @@ dict_sizes = zeros(n,1);
 
 %% normalization, first feature, then observation (required by L1 graph)
 data = NMRow(data')';
-%data = NMRow(data); %% row normalization is just for L1
+data = NMRow(data);
 %n = size(data,1); % number of observations;
 %m = size(data,2); % number of features;
 
@@ -48,7 +42,6 @@ data = NMRow(data')';
 
 adj_sim = myGaussianMedian(data);
 D = diag ( 1 ./ sum(adj_sim,1));
-data = NMRow(data);
 
 %% random walk matrix 
 P = adj_sim*D;
@@ -97,7 +90,7 @@ end
 W = zeros(n);  %% initialize the resulted graph
 
 if ~solver_flag
-    lambda = 0.1;
+    lambda = 1.0;
     rel_tol = 0.00001;
     quiet = true;
 end
@@ -138,13 +131,13 @@ for i=1:n
    %error = sum(xk(length(ids)+1:end))
    
    %%debug
-   %i
+   i
 end
 
 %%%% very important step
 %%%% we need to change the value of W that is small than 0.0001 to zero.
 %%%% these noise will affect the performance of clustering
-%figure, plot(sort(W(1,:)));
+figure, plot(sort(W(1,:)));
 W(find(W<0.0001)) = 0;
 %%%% don't apply this go gaussian, performance will be low.
 %%%% adj_gaussian(find(adj_gaussian<0.0001)) = 0;  
@@ -165,16 +158,16 @@ sprintf('L1 ACC is: %.4f\n', AC)
 
 
 %%NJW
-% WWW = NormalizationFamily(adj_sim, -0.5);
-% [~,evecs] = NJW(WWW,num_cluster);
-% idx_njw  = kmeans(evecs,num_cluster);
-% res = bestMap(true_labels,idx_njw);
-% %=============  evaluate AC: accuracy ==============
-% AC = length(find(true_labels == res))/length(true_labels);
-% %=============  evaluate MIhat: nomalized mutual information =================
-% MIhat = MutualInfo(true_labels,res);
-% 
-% sprintf('NJW NMI is:%.4f\n',MIhat)
-% sprintf('NJW ACC is: %.4f\n', AC)
+WW = NormalizationFamily(WW, -0.5);
+[~,evecs] = NJW(adj_sim,num_cluster);
+idx_njw  = kmeans(evecs,num_cluster);
+res = bestMap(true_labels,idx_njw);
+%=============  evaluate AC: accuracy ==============
+AC = length(find(true_labels == res))/length(true_labels);
+%=============  evaluate MIhat: nomalized mutual information =================
+MIhat = MutualInfo(true_labels,res);
+
+sprintf('NJW NMI is:%.4f\n',MIhat)
+sprintf('NJW ACC is: %.4f\n', AC)
 
 

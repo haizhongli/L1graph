@@ -20,25 +20,25 @@ dict_sizes = zeros(n,1);
 
 %% normalization, first feature, then observation (required by L1 graph)
 data = NMRow(data')';
-%data = NMRow(data);
+data = NMRow(data);
 %n = size(data,1); % number of observations;
 %m = size(data,2); % number of features;
 
 %% build the dimilarity matrix;
 adj_euclid = squareform(pdist(data));
-adj_gaussian =exp(-adj_euclid.^2 ./ (2*sigma^2));
-adj_gaussian(logical(eye(n))) = 0;
-D = diag ( 1 ./ sum(adj_gaussian,1));
+adj_sim = 1 ./ adj_euclid;
+adj_sim(~isfinite(adj_sim)) = 0; %% if two points are duplicated, there are zero similarity
+D = diag ( 1 ./ sum(adj_sim,1));
 
 %% random walk matrix 
-P = adj_gaussian*D;
+P = adj_sim*D;
 
 %% graph diffusion
-alpha = 1/(step+1);
-F = alpha*P^0;
-for j = 1:step
-  F = F + alpha*P^j;
-end
+% alpha = 1/(step+1);
+% F = alpha*P^0;
+% for j = 1:step
+%   F = F + alpha*P^j;
+% end
 
 %% debug
 if debug_flag
@@ -52,17 +52,18 @@ if debug_flag
         end
         
         %%draw diffusion
+        
         figure, scatter(d1(:,1),d1(:,2),30,F(:,1));
         hold on; 
         plot(d1(1,1),d1(1,2),'gd');
-        nonzero_ids = find(F(:,1)>=0.0001);
+        nonzero_ids = find(F(:,1)>0.001);
         plot(d1(nonzero_ids,1),d1(nonzero_ids,2),'r+');
         F(1,1)
         figure, plot(sort(F(:,1),'descend'));
         
         %%draw number of diffusion neighbors
         for j = 1:n
-            dif_nbs(j) = length(find(F(:,j) >=0.001));
+            dif_nbs(j) = length(find(F(:,j) >0.001));
         end
         figure, hist(dif_nbs);
         
