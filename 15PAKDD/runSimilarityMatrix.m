@@ -9,9 +9,9 @@ num_cluster = NumC;
 
 
 %% Add Path
-addpath('../BasicFunctions');
-addpath('../Competitors/NJW');
-addpath('../');
+%addpath('../BasicFunctions');
+%addpath('../Competitors/NJW');
+%addpath('../');
 %addpath('Competitors/SMCE');
 
 %% Normalization

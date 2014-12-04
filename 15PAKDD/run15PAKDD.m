@@ -1,3 +1,3 @@
 runSimilarityMatrix;
-runCalcDIffusionMatrix;
+runCalcDiffusionMatrix;
 runSpectralClustering;

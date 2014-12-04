@@ -1,6 +1,6 @@
 %% run spectral clustering based on F
 
-addpath('../l1_ls_matlab/l1_ls_matlab');
+%addpath('../l1_ls_matlab/l1_ls_matlab');
 % %% Input
  data = Data;   %% row is observation
 % num_cluster = NumC;
