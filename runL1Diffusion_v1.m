@@ -24,7 +24,7 @@ true_labels = ClusterLabels;
 n = size(data,1); % number of observations;
 m = size(data,2); % number of features;
 
-step = 3;    %% step of random walk;
+step = 1;    %% step of random walk;
 minmum_dict_size = m + 1; %% threshold of dictionary
 k_target = m;
 %% misc

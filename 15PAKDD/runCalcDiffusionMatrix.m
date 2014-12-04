@@ -21,7 +21,7 @@ P = adj_sim*D;
 %% the following code need to be improved.
 %% creat a array of matrix
 AP = zeros(size(P,1),size(P,2),T+1);
-AP(:,:,1) = P;
+AP(:,:,1) = P^0;
 for step = 2:T+1
     AP(:,:,step) = P*AP(:,:,step-1);
 end
