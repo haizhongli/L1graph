@@ -9,10 +9,11 @@ num_cluster = NumC;
 
 
 %% Add Path
-%addpath('../BasicFunctions');
-%addpath('../Competitors/NJW');
-%addpath('../');
-%addpath('Competitors/SMCE');
+addpath('/Users/shuchu/Documents/Project/L1graph/BasicFunctions');
+addpath('/Users/shuchu/Documents/Project/L1graph/Competitors/NJW');
+addpath('/Users/shuchu/Documents/Project/L1graph/');
+addpath('/Users/shuchu/Documents/Project/L1graph/15PAKDD');
+
 
 %% Normalization
 nA = NMRow(data')';
@@ -32,6 +33,7 @@ save('gaussian_fixed.mat','G_fixed');
 WW = NormalizationFamily(G_fixed, -0.5);
 [~,evecs] = NJW(WW,num_cluster);
 idx_fixed = kmeans(evecs,num_cluster);
+%idx_fixed = spectralClustering(G_fixed,num_cluster);
 [nmi_fixed,ac_fixed] = evalNMIAC(true_labels,idx_fixed)
 
 
