@@ -2,7 +2,7 @@ function [IDX,egs,evecs] = spectralClustering(W,k)
 % Spectral Clustering algorithm. 
 %
 % input: 
-%   A -- similarity matrix
+%   W -- similarity matrix
 %   k -- number of clsuters
 % ouput:
 %   h -- numbers

@@ -1,4 +1,4 @@
-function [W] = L1GraphNoise(data)
+function [W] = L1GraphNoise(data,lambda)
 % This function calculates the L1 graph of 'data'.
 % y = Ax
 %   x -- is what we are looking for, a higher dimension representation
@@ -20,6 +20,8 @@ function [W] = L1GraphNoise(data)
 % author: shhan@cs.stonybrook.edu
 % 07/21/2014
 
+addpath('/home/shuchu/data/Projects/14L1Graph/L1graph/l1_ls_matlab/l1_ls_matlab/');
+
 %% features
 m = size(data,1);
 %% samples
@@ -30,25 +32,24 @@ if not(issparse(data))
     data = sparse(data);
 end
 
-lambda = 1;
+%lambda = 1;
 rel_tol = 0.0001;
 quiet = true;
 
 W = zeros(n+m-1,n);
 
-for i = 1:n
-  if not(mod(i,10))
-      i
-  end;
+parfor i = 1:n
   %%construct the A
-  A = data;
+  dict_ids = 1:n-1;
+  dict_ids(1:i-1) = 1:i-1;
+  dict_ids(i:end) = i+1:n;
   y = data(:,i);
-  A(:,i) = [];
-  A = [A,speye(m,m)];
+  A = [data(:,dict_ids),speye(m,m)];
   [x,status] = l1_ls_nonneg(A,y,lambda,rel_tol,quiet);
   
-  %x = l1ls_featuresign(A,y,lambda);
-  W(:,i) = x;
+  xx = x;
+  xx(x < 0.01) = 0; %% remove the noise
+  W(:,i) = xx;
 end
 
 %%parse W to adjacent matrix
