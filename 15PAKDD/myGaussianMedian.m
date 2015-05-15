@@ -16,7 +16,7 @@ function [ M ] = myGaussianMedian(data)
 % calculate the arthemetic mean
 arth_mean = sum(data,1)/size(data,1);
 dist = data - repmat(arth_mean,size(data,1),1);
-sigma = median(sum(dist.^2,2))
+sigma = median(sum(dist.^2,2));
 
 eu_dist = squareform(pdist(data));
 M = exp(-eu_dist.^2 ./ sigma);

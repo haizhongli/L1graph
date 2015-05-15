@@ -1,4 +1,4 @@
-function [W] = L1GraphNoise(data,lambda)
+function [W,NZ] = L1GraphNoise(data,lambda)
 % This function calculates the L1 graph of 'data'.
 % y = Ax
 %   x -- is what we are looking for, a higher dimension representation
@@ -12,7 +12,8 @@ function [W] = L1GraphNoise(data,lambda)
 % input:
 %   data -- a data matrix: m x n , m -- features, n -- samples
 % output:
-%   W -- weight Matrix of L1 graph.
+%   W -- weight Matrix of L1 graph.N
+%   NZ -- noise
 % comment:
 %   We need a L1 solver.
 % 
@@ -20,7 +21,11 @@ function [W] = L1GraphNoise(data,lambda)
 % author: shhan@cs.stonybrook.edu
 % 07/21/2014
 
-addpath('/home/shuchu/data/Projects/14L1Graph/L1graph/l1_ls_matlab/l1_ls_matlab/');
+%addpath('/home/shuchu/data/Projects/14L1Graph/L1graph/l1_ls_matlab/l1_ls_matlab/');
+addpath('./l1_ls_matlab/l1_ls_matlab/');
+
+%% normalize the data size. ||x||_2 = 1
+data = NMRow(data')';   %% sample vector length normalization
 
 %% features
 m = size(data,1);
@@ -38,7 +43,7 @@ quiet = true;
 
 W = zeros(n+m-1,n);
 
-parfor i = 1:n
+parfor i = 1:n    
   %%construct the A
   dict_ids = 1:n-1;
   dict_ids(1:i-1) = 1:i-1;
@@ -54,6 +59,7 @@ end
 
 %%parse W to adjacent matrix
 % remove the noise part
+NZ = W(n:end,:);
 W(n:end,:) = [];
 W = W';
 

@@ -23,43 +23,49 @@ function [W] = L1GraphKNN(data,nb,K)
 %
 % author: shhan@cs.stonybrook.edu
 % 07/21/2014
+addpath('./l1_ls_matlab/l1_ls_matlab/');
+
 tic;
 %% features
 m = size(data,1);
 %% samples
 n = size(data,2);
 
-%% check value K
-K = K +1;  %% the closest neighbor is itself.
-% if K <= m
-%     K = m;
-% end
+%% normalization data
+data = NMRow(data')';
 
 %% data to be a sparse matrix
 if not(issparse(data))
     data = sparse(data);
 end
 
-lambda = 1.0;
+lambda = 0.1;
 rel_tol = 0.00001;
 quiet = true;
 
-W = zeros(n+m-1,n);
+WW = zeros(K,n);
 
-for i = 1:n
-    i
+parfor i = 1:n
   %%construct the A
+  dict_ids = nb(i,2:K+1);
   y = data(:,i);
-  A = data(:,nb(i,2:K));
-  A = [A,speye(m,m)];
+  %A = [data(:,dict_ids),speye(m,m)];
+  A = [data(:,dict_ids)];
   [x, status] = l1_ls_nonneg(A,y,lambda,rel_tol,quiet);
-  W(nb(i,2:K),i) = x(1:K-1);
-  W(end-m+1:end,i) = x(K:end);
+  xx = x;
+  xx(x < 0.01) = 0; %% remove the noise
+  WW(:,i) = xx;
 end
 
-%%parse W to adjacent matrix
-% remove the noise part
-W(n+1:end,:) = [];
+%% build the adjacent matrix
+W = zeros(n);
+for i = 1:n
+    %W(i,nb(i,2:K+1)) = WW(1:K,i);
+    W(nb(i,2:K+1),i) = WW(:,i);
+end
+
+W = W';
+
 
 toc;
 end
