@@ -12,7 +12,7 @@ function [W,NZ] = L1GraphNoise(data,lambda)
 % input:
 %   data -- a data matrix: m x n , m -- features, n -- samples
 % output:
-%   W -- weight Matrix of L1 graph.N
+%   W -- weight Matrix of L1 graph.
 %   NZ -- noise
 % comment:
 %   We need a L1 solver.
@@ -50,7 +50,7 @@ parfor i = 1:n
   dict_ids(i:end) = i+1:n;
   y = data(:,i);
   A = [data(:,dict_ids),speye(m,m)];
-  [x,status] = l1_ls_nonneg(A,y,lambda,rel_tol,quiet);
+  [x,~] = l1_ls_nonneg(A,y,lambda,rel_tol,quiet);
   
   xx = x;
   xx(x < 0.01) = 0; %% remove the noise

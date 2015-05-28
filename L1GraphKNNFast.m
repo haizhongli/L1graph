@@ -29,17 +29,16 @@ addpath('./knnsearch');
 %% the closest neighbor is iteself.
 [nb,~]=knnsearch(data',data',K+1);
 
-%% features
-m = size(data,1);
-%% samples
-n = size(data,2);
+%% size
+[~,n] = size(data);
+
 
 %% data to be a sparse matrix
 %if not(issparse(data))
 %    data = sparse(data);
 %end
 
-lambda = 1;
+lambda = 0.1;
 rel_tol = 0.00001;
 quiet = true;
 
@@ -49,7 +48,7 @@ for i = 1:n
   %%construct the A
   y = data(:,i);
   A = data(:,nb(i,2:K));
-  [x, status] = l1_ls_nonneg(A,y,lambda,rel_tol,quiet);
+  [x, ~] = l1_ls_nonneg(A,y,lambda,rel_tol,quiet);
   W(nb(i,2:K),i) = x(1:K-1);
 end
 
