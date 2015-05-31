@@ -43,18 +43,19 @@ end
 
 Wknn = WWknn ;%.* Wgau;
 Wdiffknn = WWdiff .* Wdiff;
-[Wl1diffknn] = L1GraphDiffKnnCS(data,Wdiff,KL);
+%[Wl1diffknn] = L1GraphDiffKnnCS(data,Wdiff,KL);
+[Wl1diffknn,~] = L1GraphDiffKnn(data,Wdiff,KL);
 
 %% L1 graph kNN
 nb  = knnsearch(data,data,KL+1);
 Wl1knn = L1GraphKNN(data',nb,KL);
 
 %% build affinity graph
-Wknn = Wknn + Wknn';
-Wl1knn = Wl1knn + Wl1knn';
-Wdiff = Wdiff + Wdiff';
-Wdiffknn = Wdiffknn + Wdiffknn';
-Wl1diffknn = Wl1diffknn + Wl1diffknn';
+Wknn = (Wknn + Wknn')/2;
+Wl1knn = (Wl1knn + Wl1knn')/2;
+Wdiff = (Wdiff + Wdiff')/2;
+Wdiffknn = (Wdiffknn + Wdiffknn')/2;
+Wl1diffknn = (Wl1diffknn + Wl1diffknn')/2;
 
 %% start saving
 G.Wgau = sparse(Wgau);
