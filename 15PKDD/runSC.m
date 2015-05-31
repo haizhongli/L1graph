@@ -17,24 +17,27 @@ data_names = {%'path.mat', ...
               'glass.mat', ...
               'vehicle.mat', ...
               'Image.mat'};
-aff_names = {'Wgau','Wknn','Wl1knn','Wdiff','Wdiffknn','Wl1diffknn'};
+aff_names = {'Wgau','Wknn','Wl1knn','Wdiff','Wdiffknn','Wl1diffknn','Wl1diffknnCS'};
 
 K = 10;
 
 
 N = length(data_names);
-ac_info = zeros(N,6);
-nmi_info = zeros(N,6);
+ac_info = zeros(N,7);
+nmi_info = zeros(N,7);
 
 for i = 1:N
 data_names(i)
 load(char(data_names(1)));
 G = build_graphs(Data,K,3);
-    for j = 1:6
+    for j = 1:7
         aff_names(j)
         idx = spectralClustering(full(G.(char(aff_names(j)))),NumC);
         res = bestMap(ClusterLabels,idx);
         ac_info(i,j) = length(find(ClusterLabels == res))/length(ClusterLabels);
         nmi_info(i,j) = MutualInfo(ClusterLabels,res);
     end;
+clear G;
+clear idx;
+clear res;
 end
