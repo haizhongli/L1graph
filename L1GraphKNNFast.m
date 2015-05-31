@@ -24,7 +24,7 @@ function [W] = L1GraphKNNFast(data,K)
 % 07/21/2014
 
 %% calculate the knn for each data point
-addpath('./knnsearch');
+addpath('/Users/shuchu/Documents/Project/L1graph/knnsearch');
 
 %% the closest neighbor is iteself.
 [nb,~]=knnsearch(data',data',K+1);
@@ -38,7 +38,7 @@ addpath('./knnsearch');
 %    data = sparse(data);
 %end
 
-lambda = 0.1;
+lambda = 1;
 rel_tol = 0.00001;
 quiet = true;
 

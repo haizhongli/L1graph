@@ -50,6 +50,7 @@ parfor i = 1:n
   [x,res] = myNNOMP(y,A,K);
   WW(i,:) = x;
   R(i) = res;
+  
 end
 
 %% build the adjacent matrix

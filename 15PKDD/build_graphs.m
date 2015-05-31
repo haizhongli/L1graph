@@ -1,4 +1,4 @@
-function [G] = build_graphs(data,K);
+function [G] = build_graphs(data,K,KL)
 %% this function build following graphs
 %% 1. Gaussian similarty graph: aff_matrix
 %% 2. kNN graph: unweighted,directed graph.
@@ -12,13 +12,15 @@ function [G] = build_graphs(data,K);
 %
 addpath('../');
 addpath('../knnsearch');
-addpath('../l1_ls_matlab/l1_ls_matlab')
+addpath('../l1_ls_matlab/l1_ls_matlab');
+addpath('./DIFFUSION_PACKAGE_CVPR_2013_V1_1');
 addpath('./DIFFUSION_PACKAGE_CVPR_2013_V1_1/MinMaxSelection');
+addpath('./DIFFUSION_PACKAGE_CVPR_2013_V1_1/HelpFunctions');
 
 
 %% assuming we have data variable named as "Data"
 [n,m] = size(data);
-
+KL = KL*m;
 %% calculate the distance matrix
 dist_matrix = squareform(pdist(data));
 
@@ -26,6 +28,7 @@ dist_matrix = squareform(pdist(data));
 [Wdiff,Wgau] = ICG_ApplyDiffusionProcess(dist_matrix,nan,10,0);
 %% change the diffusion value at diagnoal to zero
 Wdiff(logical(eye(size(Wdiff,1)))) = 0;
+Wgau(logical(eye(size(Wdiff,1)))) = 0;
 
 %% KNN 
 WWknn = zeros(n);
@@ -40,20 +43,21 @@ end
 
 Wknn = WWknn ;%.* Wgau;
 Wdiffknn = WWdiff .* Wdiff;
-[Wl1diffknn,~] = L1GraphDiffKnn(data,Wdiff,2*m);
+[Wl1diffknn] = L1GraphDiffKnnCS(data,Wdiff,KL);
 
 %% L1 graph kNN
-Wl1knn = L1GraphKNNFast(data',2*m);
+nb  = knnsearch(data,data,KL+1);
+Wl1knn = L1GraphKNN(data',nb,KL);
 
 %% start saving
-G.Wgau = Wgau;
+G.Wgau = sparse(Wgau);
 G.Wknn = sparse(Wknn);
 G.Wl1knn = sparse(Wl1knn);
 G.Wdiff = Wdiff;
 G.Wdiffknn = Wdiffknn;
 G.Wl1diffknn = sparse(Wl1diffknn);
 
-save('G.mat','G');
+%save('G.mat','G');
 
 end
 

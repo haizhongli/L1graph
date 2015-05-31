@@ -41,7 +41,7 @@ lambda = 0.1;
 rel_tol = 0.00001;
 quiet = true;
 
-WW = zeros(K,n); %% col is the index
+WW = zeros(n,K); %% col is the index
 [~,idx] = maxk(diff_matrix,K,2);
 
 parfor i = 1:n  
@@ -54,17 +54,14 @@ parfor i = 1:n
   [x, ~] = l1_ls_nonneg(A,y,lambda,rel_tol,quiet);
   xx = x;
   xx(x < 0.01) = 0; %% remove the noise
-  WW(:,i) = xx;
+  WW(i,:) = xx';
 end
 
 %% build the adjacent matrix
 W = zeros(n);
 for i = 1:n
-    %W(i,nb(i,2:K+1)) = WW(1:K,i);
-    W(idx(i,:),i) = WW(:,i);
+     W(i,idx(i,:)) = WW(i,:);
 end
-
-W = W';
 
 toc;
 end
