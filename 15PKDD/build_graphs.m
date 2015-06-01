@@ -46,6 +46,9 @@ Wdiffknn = WWdiff .* Wdiff;
 [Wl1diffknnCS] = L1GraphDiffKnnCS(data,Wdiff,KL);
 [Wl1diffknn,~] = L1GraphDiffKnn(data,Wdiff,KL);
 
+%% L1 graph
+Wl1 = L1GraphNoise(data',0.5);
+
 %% L1 graph kNN
 nb  = knnsearch(data,data,KL+1);
 Wl1knn = L1GraphKNN(data',nb,KL);
@@ -57,6 +60,7 @@ Wdiff = (Wdiff + Wdiff')/2;
 Wdiffknn = (Wdiffknn + Wdiffknn')/2;
 Wl1diffknn = (Wl1diffknn + Wl1diffknn')/2;
 Wl1diffknnCS = (Wl1diffknnCS + Wl1diffknnCS')/2;
+Wl1 = (Wl1 + Wl1')/2;
 
 %% start saving
 G.Wgau = sparse(Wgau);
@@ -66,8 +70,7 @@ G.Wdiff = Wdiff;
 G.Wdiffknn = Wdiffknn;
 G.Wl1diffknn = sparse(Wl1diffknn);
 G.Wl1diffknnCS = sparse(Wl1diffknnCS);
-
-%save('G.mat','G');
+G.Wl1 = sparse(Wl1);
 
 end
 
