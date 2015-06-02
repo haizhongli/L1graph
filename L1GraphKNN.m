@@ -46,7 +46,7 @@ WW = zeros(n,K);
 parfor i = 1:n
   %%construct the A
   dict_ids = nb(i,2:K+1);
-  y = data(i,:);
+  y = data(i,:)';
   A = data(dict_ids,:)';
   [x, ~] = l1_ls_nonneg(A,y,lambda,rel_tol,quiet);
   xx = x;

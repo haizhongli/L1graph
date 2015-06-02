@@ -16,6 +16,8 @@ function [G] = build_graphs_v1(data,d)
 % shhan@cs.stonybrook.edu
 % Tue Jun  2 11:45:54 EDT 2015
 
+[n,m] = size(data);
+
 % calculate the Euclidean distance
 dist_matrix = squareform(pdist(data));
 
