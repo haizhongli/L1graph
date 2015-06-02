@@ -37,7 +37,7 @@ if not(issparse(data))
     data = sparse(data);
 end
 
-lambda = 0.1;
+lambda = 0.5;
 rel_tol = 0.00001;
 quiet = true;
 
@@ -53,7 +53,7 @@ parfor i = 1:n
   
   [x, ~] = l1_ls_nonneg(A,y,lambda,rel_tol,quiet);
   xx = x;
-  xx(x < 0.01) = 0; %% remove the noise
+  xx(x < 0.00001) = 0; %% remove the noise
   WW(i,:) = xx';
 end
 

@@ -11,13 +11,14 @@ D = sum(W,2);
 D = diag(D);
 D = D^(-1/2);
 L =  D*W*D;
-[evecs,egs] = eigs(sparse(L),k,'LR');
+%[evecs,egs] = eigs(sparse(L),k,'LR');
+[evecs,egs] = eigs(sparse(L),k);
 %[egss,ids] = sort(diag(egs),'descend');
 [egss,ids] = sort(diag(egs),'descend');
 %figure, plot(egss(1:k),'-*');
 evecs = evecs(:,ids(1:end));
 evecs = NMRow(evecs); %abandoned the first eigenvalue/vectors
-IDX = kmeans(evecs,k);
+IDX = kmeans(evecs,k,'start','uniform','emptyaction','singleton');
 %[ctrs,~,~] = WCSSKmeans(evecs,k,50,50);
 %IDX = findlabels(ctrs,evecs);
 end

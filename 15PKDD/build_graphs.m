@@ -25,7 +25,7 @@ KL = KL*m;
 dist_matrix = squareform(pdist(data));
 
 %% diffusion and Gaussian similarity matrix
-[Wdiff,Wgau] = ICG_ApplyDiffusionProcess(dist_matrix,nan,10,0);
+[Wdiff,Wgau] = ICG_ApplyDiffusionProcess(dist_matrix,nan,K,0);
 %% change the diffusion value at diagnoal to zero
 Wdiff(logical(eye(size(Wdiff,1)))) = 0;
 Wgau(logical(eye(size(Wdiff,1)))) = 0;
@@ -41,7 +41,7 @@ for i = 1:n
     WWdiff(i,diff_loc) = 1;
 end
 
-Wknn = WWknn ;%.* Wgau;
+Wknn = WWknn .* Wgau;
 Wdiffknn = WWdiff .* Wdiff;
 [Wl1diffknnCS] = L1GraphDiffKnnCS(data,Wdiff,KL);
 [Wl1diffknn,~] = L1GraphDiffKnn(data,Wdiff,KL);
