@@ -1,5 +1,5 @@
-function [W] = L1Graph(data)
-% This function calculates the L1 graph of 'data'.
+function [W,NZ] = L1Graph(data,lambda)
+% This function calculates L1 graph from input data.
 % y = Ax
 %   x -- is what we are looking for, a higher dimension representation
 %   y -- is each sample(or data point) of input data.
@@ -12,47 +12,46 @@ function [W] = L1Graph(data)
 % input:
 %   data -- a data matrix: m x n , m -- features, n -- samples
 % output:
-%   W -- weight Matrix of L1 graph.
+%   W -- weight Matrix of L1 graph. nxn, Each row is coefficients.
+%   NZ -- noise. mxn
 % comment:
-%   We need a L1 solver.
-% 
+%   Require "l1_ls" package from stanford.
+%
 %
 % author: shhan@cs.stonybrook.edu
-% 07/21/2014
+% 08/14/2015
+addpath('./l1_ls_matlab/');
+tic;
+% data
+[m,n] = size(data);
 
-%% features
-m = size(data,1);
-%% samples
-n = size(data,2);
+% normalize data into unit hypersphere.
+data = NMCol(data);
 
 %% data to be a sparse matrix
 if not(issparse(data))
     data = sparse(data);
 end
 
-lambda = 1;
-rel_tol = 0.0001;
+% parameter for L1 solver.
+rel_tol = 0.00001;
 quiet = true;
 
+% parallel code for calculating sparse codes.
 W = zeros(n-1,n);
-
-for i = 1:n
-  %if not(mod(i,10))
-  %    i
-  %end;
+NZ = zeros(m,n);
+parfor i = 1:n    
   %%construct the A
-  A = data;
   y = data(:,i);
+  A = [data,speye(m)];
   A(:,i) = [];
-  [x,status] = l1_ls_nonneg(A,y,lambda,rel_tol,quiet);
-  %x = l1ls_featuresign(A,y,lambda);
-  W(:,i) = x;
+  [x,~] = l1_ls_nonneg(A,y,lambda,rel_tol,quiet);
+  W(:,i) = x(1:n-1);
+  NZ(:,i) = x(n:end);
 end
 
-%%parse W to adjacent matrix
-% remove the noise part
-W = W';
-
+% modify W from [n-1,n] to [n,n]
+W=W';
 % j > i part
 U = triu(W);
 % j < i part
@@ -63,5 +62,5 @@ pad = zeros(n,1);
 U = [pad U];
 L = [L pad];
 W = U + L;
-
+toc;
 end

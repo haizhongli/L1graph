@@ -1,4 +1,4 @@
-function [W] = L1GraphKNNGreedy(data,nb,K)
+function [W] = L1GraphKNNGreedy(data,nb,theta)
 % This function calculates the L1 graph of 'data' by selecting neigbors
 % with kNN method and solve with Greedy algorithm
 % y = Ax
@@ -8,13 +8,13 @@ function [W] = L1GraphKNNGreedy(data,nb,K)
 %   size:
 %      x: (m+n-1) x 1
 %      y: m x 1
-%      A: m x (m+n-1)
+%      A: m x n
 %
 % input:
-%   data -- a data matrix:n x m , m -- features, n -- samples
-%   nb   -- the matrix describe the nearest neighbors of each data sample 
-%            at each row.
-%   K    -- k nearest neighbor.
+%   data -- a data matrix: (m,n) , m -- features, n -- samples
+%   nb   -- (n,K), the matrix describe the nearest neighbors INDEX of 
+%             each data sample at each row. 
+%   theta  -- the approximate threshold.
 % output:
 %   W -- weight Matrix of L1 graph.
 % comment:
@@ -26,31 +26,31 @@ function [W] = L1GraphKNNGreedy(data,nb,K)
 
 
 tic;
-[n,m] = size(data);
+[~,n] = size(data);
+[~,K] = size(nb);
 
 %% normalization data
-data = NMRow(data);
+data = NMCol(data);
 
 %% data to be a sparse matrix
 if not(issparse(data))
     data = sparse(data);
 end
 
-WW = zeros(n,K);
+WW = zeros(K,n);
 
 parfor i = 1:n
   %%construct the A
-  dict_ids = nb(i,2:K+1);
-  y = data(i,:)';
-  A = [data(dict_ids,:)]';
-  [x,~] = myNNOMP(y,A,K);
-  WW(i,:) = x;
+  dict_ids = nb(i,:);
+  y = data(:,i);
+  [x,~] = myNNOMP(y,data(:,dict_ids),theta);
+  WW(:,i) = x;
 end
 
 %% build the adjacent matrix
 W = zeros(n);
 for i = 1:n
-    W(i,nb(i,2:K+1)) = WW(i,:);
+    W(nb(i,:),i) = WW(:,i);
 end
 
 toc;

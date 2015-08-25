@@ -1,0 +1,76 @@
+%script for ICDM15 paper
+addpath('./MinMaxSelection');
+addpath('./ZPclustering');
+
+% K = 10;
+% 
+% % % knn
+% % dt = squareform(pdist(data));
+% % [~,nb] = mink(dt,K+1,2);
+% % nb(:,1) =[];
+% 
+% % manifold ranking
+% R = ManifoldRanking(data',0.5,0.1);
+% [~,nb] = maxk(R,K,1);
+% nb = nb';
+% 
+% % test L1 graph Spectral Clustering performance.
+% % [W_l1,NZ_l1] = L1Graph(data',0.1);
+% [W_l1,~] = L1GraphKNN(data',nb,K,0.1);
+% % [W_l1] = L1GraphKNNGreedy(data',nb,1e-5);
+% %[W_l1,~] = L1GraphDiffKnn(data',R,10,0.1);
+%  
+% %remove small coefficient
+% W_l1(W_l1<0.0001) = 0;
+% W = (W_l1 + W_l1')/2;
+% 
+% figure, gplot(W,data);
+% hold on
+% plot(data(:,1),data(:,2),'r+')
+% hold off
+% 
+% idx = spectralClustering(W,NumC);
+% res = bestMap(ClusterLabels,idx);
+% ac_info = length(find(ClusterLabels == res))/length(ClusterLabels);
+% nmi_info = MutualInfo(ClusterLabels,res);
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% create figures for testing parameters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+data = ;  %% row represents sample.
+nc = ;  % number of cluster.
+cl = ;  % cluster labels.
+
+N = size(data,1);
+
+dist_matrix = squareform(pdist(data));
+
+% test the self-tunring clustering
+K = 15;
+
+[~,W_st,~] = scale_dist(data,K);
+
+[st_nmi,st_ac] = checkClustering(W_st,nc,cl);
+
+% test the L1-Graph
+[W_l1,~] = L1Graph(data',0.1);
+[l1_nmi,l1_ac] = checkClustering(W_st,nc,cl);
+
+% test the LOP-L1 Graph
+lopl1_score = zeros(5,2);
+for t = 0.1:0.1:0.5
+   s = t*N;
+   [~,nb] = mink(dt,s+1,2);
+   nb(:,1) =[];
+   [W_l1,~] = L1GraphKNN(data',nb,K,0.1);
+   W_l1(W_l1<0.0001) = 0;
+   W = (W_l1 + W_l1')/2;
+   
+   
+end
+
+
+
+

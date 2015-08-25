@@ -7,17 +7,19 @@ function [IDX,egs,evecs] = spectralClustering(W,k)
 % ouput:
 %   h -- numbers
 
+
 D = sum(W,2);
+D = D.^(-1/2);
+D(~isfinite(D)) = 0;
 D = diag(D);
-D = D^(-1/2);
-L =  D*W*D;
-%[evecs,egs] = eigs(sparse(L),k,'LR');
-[evecs,egs] = eigs(sparse(L),k);
+L =  D * W * D;
+opts.tol = 1e-3;
+[evecs,egs] = eigs(sparse(L),k,'lr',opts);
 %[egss,ids] = sort(diag(egs),'descend');
-[egss,ids] = sort(diag(egs),'descend');
+%[~,ids] = sort(diag(egs),'descend');
 %figure, plot(egss(1:k),'-*');
-evecs = evecs(:,ids(1:end));
-evecs = NMRow(evecs); %abandoned the first eigenvalue/vectors
+%evecs = evecs(:,1:end); 
+evecs = NMRow(evecs); 
 IDX = kmeans(evecs,k,'start','uniform','emptyaction','singleton');
 %[ctrs,~,~] = WCSSKmeans(evecs,k,50,50);
 %IDX = findlabels(ctrs,evecs);

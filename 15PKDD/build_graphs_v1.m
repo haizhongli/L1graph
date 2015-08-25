@@ -32,7 +32,7 @@ W = sigmas_i*sigmas_i';
 aff_matrix = exp(-dist_matrix.^2./W);
 
 % calcualte L1 Graph, lamda equals to 0.5
-G.Wl1 = L1GraphNoise(data',0.5);
+%G.Wl1 = L1GraphNoise(data',0.5);
 
 % LopL1Greedy 
 G.WLopL1Greedy = L1GraphKNNGreedy(data,locs,d);
