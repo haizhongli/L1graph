@@ -79,11 +79,14 @@ end
 
 
 % test the LOP-L1 diff Graph
-lopl1_diff_score = zeros(5,2);
-lopl1_diff_greedy_score = zeros(5,2);
+lds_nmi = zeros(5,5);
+lds_ac = zeros(5,5);
+ldgs_nmi = zeros(5,5);
+ldgs_ac = zeros(5,5);
 
-for alpha = 0.1:0.2:0.9
-    R = ManifoldRankingV1(W_st,alpha);
+alpha = [0.1,0.3,0.5,0.7,0.9];
+for a = 1:5
+    R = ManifoldRankingV1(W_st,alpha(a));
     for t = 1:5
        s = floor(t*N*0.1);
        [~,nb] = maxk(R,s,1);
@@ -91,12 +94,12 @@ for alpha = 0.1:0.2:0.9
        [W_l1,~] = L1GraphKNN(data',nb,s,0.1);
        W_l1(W_l1<0.0001) = 0;
        W = (W_l1 + W_l1')/2;
-       [lopl1_diff_score(t,1),lopl1_diff_score(t,2)] = checkClustering(W,nc,cl);
+       [lds_nmi(a,t),lds_ac(a,t)] = checkClustering(W,nc,cl);
 
        [W_l1] = L1GraphKNNGreedy(data',nb,1e-5);
        W_l1(W_l1<0.0001) = 0;
        W = (W_l1 + W_l1')/2;
-       [lopl1_diff_greedy_score(t,1),lopl1_diff_greedy_score(t,2)] = checkClustering(W,nc,cl);
+       [ldgs_nmi(a,t),ldgs_ac(a,t)] = checkClustering(W,nc,cl);
     end 
 end
 
