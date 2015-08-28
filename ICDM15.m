@@ -37,7 +37,7 @@ addpath('./ZPclustering');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % create figures for testing parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+if 0
 data = data1.data;  %% row represents sample.
 nc = data1.NumC;  % number of cluster.
 cl = data1.ClusterLabels;  % cluster labels.
@@ -103,3 +103,69 @@ for a = 1:5
     end 
 end
 
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% experiments over UCI dataset 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+data = ScaleRow(Data')';  %% row represents sample.
+nc = NumC;  % number of cluster.
+cl = ClusterLabels;  % cluster labels.
+
+[N,M] = size(data);
+
+nmi = zeros(6,1);
+ac = zeros(6,1);
+
+
+tic;
+dt = squareform(pdist(data));
+t1 = toc;
+% test the self-tunring clustering
+K = 10;
+
+tic;
+[~,W_st,~] = scale_dist(dt,K);
+t2 = toc;
+[nmi(1),ac(1)] = checkClustering(W_st,nc,cl);
+
+% test the L1-Graph
+[W_l1,~] = L1Graph(data',0.1);
+W_l1(W_l1<0.0001) = 0;
+W = (W_l1 + W_l1')/2;
+[nmi(2),ac(2)] = checkClustering(W,nc,cl);
+
+% test the LOP-L1 Graph
+
+s = 2*M;
+[~,nb] = mink(dt,s+1,2);
+nb(:,1) =[];
+[W_l1,~] = L1GraphKNN(data',nb,s,0.1);
+W_l1(W_l1<0.0001) = 0;
+W = (W_l1 + W_l1')/2;
+[nmi(3),ac(3)] = checkClustering(W,nc,cl);
+
+[W_l1] = L1GraphKNNGreedy(data',nb,1e-5);
+W_l1(W_l1<0.0001) = 0;
+W = (W_l1 + W_l1')/2;
+[nmi(4),ac(4)] = checkClustering(W,nc,cl);
+
+
+% test the LOP-L1 diff Graph
+
+tic;
+R = ManifoldRankingV1(W_st,0.1);
+t3 = toc;
+
+s = 2*M;
+[~,nb] = maxk(R,s,1);
+nb = nb';
+[W_l1,~] = L1GraphKNN(data',nb,s,0.1);
+W_l1(W_l1<0.0001) = 0;
+W = (W_l1 + W_l1')/2;
+[nmi(5),ac(5)] = checkClustering(W,nc,cl);
+
+[W_l1] = L1GraphKNNGreedy(data',nb,1e-5);
+W_l1(W_l1<0.0001) = 0;
+W = (W_l1 + W_l1')/2;
+[nmi(6),ac(6)] = checkClustering(W,nc,cl);
