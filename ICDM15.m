@@ -38,9 +38,9 @@ addpath('./ZPclustering');
 % create figures for testing parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if 0
-data = data1.data;  %% row represents sample.
-nc = data1.NumC;  % number of cluster.
-cl = data1.ClusterLabels;  % cluster labels.
+data = ScaleRow(Data')';  %% row represents sample.
+nc = NumC;  % number of cluster.
+cl = ClusterLabels;  % cluster labels.
 
 N = size(data,1);
 
@@ -79,16 +79,17 @@ end
 
 
 % test the LOP-L1 diff Graph
-lds_nmi = zeros(5,5);
-lds_ac = zeros(5,5);
-ldgs_nmi = zeros(5,5);
-ldgs_ac = zeros(5,5);
+nn = 10;
+lds_nmi = zeros(nn,nn);
+lds_ac = zeros(nn,nn);
+ldgs_nmi = zeros(nn,nn);
+ldgs_ac = zeros(nn,nn);
 
-alpha = [0.1,0.3,0.5,0.7,0.9];
-for a = 1:5
+alpha = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.99];
+for a = 1:10
     R = ManifoldRankingV1(W_st,alpha(a));
-    for t = 1:5
-       s = floor(t*N*0.1);
+    for t = 1:10
+       s = floor(t*N*0.05);
        [~,nb] = maxk(R,s,1);
        nb = nb';
        [W_l1,~] = L1GraphKNN(data',nb,s,0.1);
@@ -107,7 +108,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % experiments over UCI dataset 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+if 1
 data = ScaleRow(Data')';  %% row represents sample.
 nc = NumC;  % number of cluster.
 cl = ClusterLabels;  % cluster labels.
@@ -130,10 +131,18 @@ t2 = toc;
 [nmi(1),ac(1)] = checkClustering(W_st,nc,cl);
 
 % test the L1-Graph
-[W_l1,~] = L1Graph(data',0.1);
-W_l1(W_l1<0.0001) = 0;
-W = (W_l1 + W_l1')/2;
+%[W_l1,~] = L1Graph(data',0.1);
+% W_l1(W_l1<0.0001) = 0;
+% W = (W_l1 + W_l1')/2;
+% [nmi(2),ac(2)] = checkClustering(W,nc,cl);
+
+
+%test YingZhen's Code
+addpath('./lrl1graph-code');
+W = yz_l1graph(data,0.1);
 [nmi(2),ac(2)] = checkClustering(W,nc,cl);
+
+pause;
 
 % test the LOP-L1 Graph
 
@@ -154,10 +163,9 @@ W = (W_l1 + W_l1')/2;
 % test the LOP-L1 diff Graph
 
 tic;
-R = ManifoldRankingV1(W_st,0.1);
+R = ManifoldRankingV1(W_st,0.99);
 t3 = toc;
 
-s = 2*M;
 [~,nb] = maxk(R,s,1);
 nb = nb';
 [W_l1,~] = L1GraphKNN(data',nb,s,0.1);
@@ -169,3 +177,4 @@ W = (W_l1 + W_l1')/2;
 W_l1(W_l1<0.0001) = 0;
 W = (W_l1 + W_l1')/2;
 [nmi(6),ac(6)] = checkClustering(W,nc,cl);
+end;
