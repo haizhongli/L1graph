@@ -1,2 +1,6 @@
 .DS_Store
 *.swp
+*.mexa64
+*.mexglx
+*.mexmaci64
+*.mexw64
