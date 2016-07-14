@@ -1,4 +1,4 @@
-function [W,NZ] = L1Graph(data,mode,lambda)
+function [W,NZ] = L1GraphGreedy(data,theta)
 % This function calculates L1 graph from input data.
 % y = Ax
 %   x -- is what we are looking for, a higher dimension representation
@@ -19,6 +19,7 @@ function [W,NZ] = L1Graph(data,mode,lambda)
 %
 %
 % author: shhan@cs.stonybrook.edu
+% 07/13/2016 version 3 using NNOMP
 % 07/4/2016  version 2, using spams-matlab solver
 % 08/14/2015 version 1
 %
@@ -29,18 +30,8 @@ tic;
 % normalize data into unit hypersphere.
 data = NormalizeFea(data',1)';
 
-%% data to be a sparse matrix
-%if not(issparse(data))
-%    data = sparse(data);
-%end
-
-% parameter for L1 solver.
-param.mode=mode;
-param.lambda = lambda;
-if (mode == 2)
-    param.lambda2 = 10*lambda;
-end
-param.numThreads=-1;
+% parameters for spams-matlab
+param.eps = theta;
 
 % parallel code for calculating sparse codes.
 W = zeros(n-1,n);
@@ -48,13 +39,12 @@ NZ = zeros(m,n);
 parfor i = 1:n    
   %%construct the A
   y = data(:,i);
-  %A = [data,speye(m)];
-  A = [data,eye(m)];
+  A = data;
   A(:,i) = [];
- % [x,~] = l1_ls_nonneg(A,y,lambda,rel_tol,quiet);
-  [x,~] = mexLasso(y,A,param);
-  W(:,i) = x(1:n-1);
-  NZ(:,i) = x(n:end);
+  %[x,~] = myNNOMP(y,A,theta);
+  %[x,~] = OMP(A,y,theta);
+  [x,~] = mexOMP(y,A,param);
+  W(:,i) = x;
 end
 
 % modify W from [n-1,n] to [n,n]
@@ -73,11 +63,16 @@ W = U + L;
 % make all positive.
 W = abs(W);
 
-% remove extreme small value;
-W(W<0.0001) = 0;
+%% make the max value of each row equals to one
+Wm = max(W,[],2);
+Wmm = repmat(Wm,1,n);
+
+W = W ./ Wmm;
 
 % symmetry
 W = (W+W')/2;
 
+% remove extreme small value;
+W(W<0.0001) = 0;
 toc;
 end

@@ -1,4 +1,4 @@
-function [nmi,ac] = evalNMIAC(true_labels,predict_labels)
+function [nmi,acc] = evalNMIAC(true_labels,predict_labels)
 % This code is following Dr. Deng Cai's code. 
 % http://www.cad.zju.edu.cn/home/dengcai/
 %
@@ -11,10 +11,7 @@ function [nmi,ac] = evalNMIAC(true_labels,predict_labels)
 % find best match
 res = bestMap(true_labels,predict_labels);
 % evaluate AC: accuracy 
-ac = length(find(true_labels == res))/length(true_labels);
+acc = length(find(true_labels == res))/length(true_labels);
 % evaluate MIhat: nomalized mutual information 
 nmi = MutualInfo(true_labels,res);
-
-
-
 end

@@ -19,10 +19,11 @@ function [W] = L1GraphKNNGreedy(data,nb,theta)
 %   W -- weight Matrix of L1 graph.
 % comment:
 %   We need a L1 solver.
-% 
 %
 % author: shhan@cs.stonybrook.edu
+% 07/13 2016 version 2, using OMP instead
 %Tue Jun  2 14:30:47 EDT 2015
+
 
 
 tic;
@@ -30,12 +31,10 @@ tic;
 [~,K] = size(nb);
 
 %% normalization data
-data = NMCol(data);
+data = NormalizeFea(data',1)';
 
-%% data to be a sparse matrix
-if not(issparse(data))
-    data = sparse(data);
-end
+% parameters for spams-matlab
+param.eps = theta;
 
 WW = zeros(K,n);
 
@@ -43,15 +42,33 @@ parfor i = 1:n
   %%construct the A
   dict_ids = nb(i,:);
   y = data(:,i);
-  [x,~] = myNNOMP(y,data(:,dict_ids),theta);
+  %[x,~] = myNNOMP(y,data(:,dict_ids),theta);
+  [x,~] = mexOMP(y,data(:,dict_ids),param);
   WW(:,i) = x;
 end
 
 %% build the adjacent matrix
-W = zeros(n);
+W = sparse(n,n);
 for i = 1:n
     W(nb(i,:),i) = WW(:,i);
 end
+
+W = W';
+
+% make all positive.
+W = abs(W);
+
+%% make the max value of each row equals to one
+Wm = max(W,[],2);
+Wmm = repmat(Wm,1,n);
+
+W = W ./ Wmm;
+
+% symmetry
+W = (W+W')/2;
+
+% remove extreme small value;
+W(W<0.0001) = 0;
 
 toc;
 end

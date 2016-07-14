@@ -1,4 +1,4 @@
-function [W,NZ] = L1GraphKNN(data,nb,K,lambda)
+function [W,NZ] = L1GraphKNN(data,nb,K,lambda,mode)
 % This function calculates the L1 graph of 'data' by selecting neigbors
 % with kNN method.
 % y = Ax
@@ -16,6 +16,7 @@ function [W,NZ] = L1GraphKNN(data,nb,K,lambda)
 %   nb   -- matrix of dictionary pool,
 %   K    -- k nearest neighbor.
 %   lambda  -- parameter for L1 solver.
+%   mode -- mode for spams-matlab solver. mode 1: l1 regular, mode2: elastic net
 % output:
 %   W -- weight Matrix of L1 graph.
 % comment:
@@ -26,25 +27,21 @@ function [W,NZ] = L1GraphKNN(data,nb,K,lambda)
 % 08/15/2015
 
 %% calculate the knn for each data point
-%addpath('./knnsearch');
-addpath('./l1_ls_matlab/');
 tic;
-%% the closest neighbor is iteself.
-%[nb,~]=knnsearch(data',data',K);
 
 % size of data
 [m,n] = size(data);
 
 % normalize data
-data = NMCol(data);
+data = NormalizeFea(data',1)';
 
-%% data to be a sparse matrix
-if not(issparse(data))
-    data = sparse(data);
+% parameter for L1 solver.
+param.mode=mode;
+param.lambda = lambda;
+if (mode == 2)
+    param.lambda2 = 10*lambda;
 end
-
-rel_tol = 0.00001;
-quiet = true;
+param.numThreads=-1;
 
 NZ = zeros(m,n);
 WW = zeros(K,n);
@@ -52,8 +49,8 @@ WW = zeros(K,n);
 parfor i = 1:n
   %%construct the A
   y = data(:,i);
-  A = [data(:,nb(i,:)),speye(m)];
-  [x, ~] = l1_ls_nonneg(A,y,lambda,rel_tol,quiet);
+  A = [data(:,nb(i,:)),eye(m)];
+  [x,~] = mexLasso(y,A,param);
   WW(:,i) = x(1:K);
   NZ(:,i) = x(K+1:end);
 end
@@ -64,5 +61,11 @@ W = zeros(n);
 for i = 1:n
     W(nb(i,:),i) = WW(:,i);
 end;
+W = W';
+W = abs(W);
+W(W<0.0001) = 0;
+
+W = (W+W')/2;
+
 toc;
 end
